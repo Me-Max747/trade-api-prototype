@@ -1,124 +1,110 @@
 <?php
-class Api_Trade_Payeer
+
+class ApiTradePayeer
 {
-    private $arParams = array();
-    private $arError = array();
+    private array $arParams = array();
+    private array $arErrors = array();
 
-
-    public function __construct($params = array())
+    public function __construct($arParams = array())
     {
-        $this->arParams = $params;
+        $this->arParams = $arParams;
     }
 
-
-    private function Request($req = array())
+    /**
+     * @throws Exception
+     */
+    private function request($arRequest = array()): ?array
     {
-        $msec = round(microtime(true) * 1000);
-        $req['post']['ts'] = $msec;
+        $arRequest["post"]["ts"] = round(microtime(true) * 1000);
 
-        $post = json_encode($req['post']);
+        $arPost = json_encode($arRequest["post"]);
 
-        $sign = hash_hmac('sha256', $req['method'].$post, $this->arParams['key']);
+        $sSign = hash_hmac("sha256", $arRequest["method"].$arPost, $this->arParams["key"]);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://payeer.com/api/trade/".$req['method']);
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        $rsCurlHandler = curl_init();
+        curl_setopt($rsCurlHandler, CURLOPT_URL, "https://payeer.com/api/trade/".$arRequest["method"]);
+        curl_setopt($rsCurlHandler, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($rsCurlHandler, CURLOPT_HEADER, false);
+        curl_setopt($rsCurlHandler, CURLOPT_POST, true);
+        curl_setopt($rsCurlHandler, CURLOPT_POSTFIELDS, $arPost);
+        curl_setopt($rsCurlHandler, CURLOPT_HTTPHEADER, array(
             "Content-Type: application/json",
-            "API-ID: ".$this->arParams['id'],
-            "API-SIGN: ".$sign
+            "API-ID: ".$this->arParams["id"],
+            "API-SIGN: ".$sSign
         ));
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $sCurlResponse = curl_exec($rsCurlHandler);
+        curl_close($rsCurlHandler);
 
-        $arResponse = json_decode($response, true);
+        $arResponse = json_decode($sCurlResponse, true);
 
-        if ($arResponse['success'] !== true)
+        if($arResponse["success"] !== true)
         {
-            $this->arError = $arResponse['error'];
-            throw new Exception($arResponse['error']['code']);
+            $this->arErrors[] = $arResponse["error"];
+            throw new Exception($arResponse["error"]["code"]);
         }
 
         return $arResponse;
     }
 
-
-    public function GetError()
+    public function getError(): array
     {
-        return $this->arError;
+        return $this->arErrors;
     }
 
-
-    public function Info()
+    public function info(): ?array
     {
-        $res = $this->Request(array(
-            'method' => 'info',
+        return $this->request(array(
+            "method" => "info",
         ));
-
-        return $res;
     }
 
-
-    public function Orders($pair = 'BTC_USDT')
+    public function orders($sPair = "BTC_USDT"): ?array
     {
-        $res = $this->Request(array(
-            'method' => 'orders',
-            'post' => array(
-                'pair' => $pair,
+        $arResponse = $this->request(array(
+            "method" => "orders",
+            "post" => array(
+                "pair" => $sPair,
             ),
         ));
 
-        return $res['pairs'];
+        return $arResponse["pairs"];
     }
 
-
-    public function Account()
+    public function account(): ?array
     {
-        $res = $this->Request(array(
-            'method' => 'account',
+        $arResponse = $this->request(array(
+            "method" => "account",
         ));
 
-        return $res['balances'];
+        return $arResponse["balances"];
     }
 
-
-    public function OrderCreate($req = array())
+    public function orderCreate($arPost = array()): ?array
     {
-        $res = $this->Request(array(
-            'method' => 'order_create',
-            'post' => $req,
+        return $this->request(array(
+            "method" => "order_create",
+            "post" => $arPost,
         ));
-
-        return $res;
     }
 
-
-    public function OrderStatus($req = array())
+    public function orderStatus($arPost = array())
     {
-        $res = $this->Request(array(
-            'method' => 'order_status',
-            'post' => $req,
+        $arResponse = $this->request(array(
+            "method" => "order_status",
+            "post" => $arPost,
         ));
 
-        return $res['order'];
+        return $arResponse["order"];
     }
 
-
-    public function MyOrders($req = array())
+    public function myOrders($arPost = array())
     {
-        $res = $this->Request(array(
-            'method' => 'my_orders',
-            'post' => $req,
+        $arResponse = $this->request(array(
+            "method" => "my_orders",
+            "post" => $arPost,
         ));
 
-        return $res['items'];
+        return $arResponse["items"];
     }
 }
