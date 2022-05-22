@@ -61,6 +61,17 @@ class ApiTradePayeer
      * @return array
      * @throws Exception
      */
+    public function time(): array
+    {
+        return $this->request(array(
+            "method" => "time",
+        ));
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
     public function info(): array
     {
         return $this->request(array(
@@ -73,10 +84,44 @@ class ApiTradePayeer
      * @return array
      * @throws Exception
      */
-    public function orders(string $sPair = "BTC_USDT"): array
+    public function ticker(string $sPair = "BTC_USD"): array
+    {
+        $arResponse = $this->request(array(
+            "method" => "ticker",
+            "post" => array(
+                "pair" => $sPair,
+            ),
+        ));
+
+        return $arResponse["pairs"] ?? array();
+    }
+
+    /**
+     * @param string $sPair
+     * @return array
+     * @throws Exception
+     */
+    public function orders(string $sPair = "BTC_USD"): array
     {
         $arResponse = $this->request(array(
             "method" => "orders",
+            "post" => array(
+                "pair" => $sPair,
+            ),
+        ));
+
+        return $arResponse["pairs"] ?? array();
+    }
+
+    /**
+     * @param string $sPair
+     * @return array
+     * @throws Exception
+     */
+    public function trades(string $sPair = "BTC_USD"): array
+    {
+        $arResponse = $this->request(array(
+            "method" => "trades",
             "post" => array(
                 "pair" => $sPair,
             ),
@@ -112,18 +157,52 @@ class ApiTradePayeer
     }
 
     /**
+     * @param int $iOrderId
+     * @return array
+     * @throws Exception
+     */
+    public function orderStatus(int $iOrderId = 0): array
+    {
+        $arResponse = $this->request(array(
+            "method" => "order_status",
+            "post" => array(
+                "order_id" => (string)$iOrderId,
+            ),
+        ));
+
+        return $arResponse["order"] ?? array();
+    }
+
+    /**
+     * @param int $iOrderId
+     * @return bool
+     * @throws Exception
+     */
+    public function orderCancel(int $iOrderId = 0): bool
+    {
+        $arResponse = $this->request(array(
+            "method" => "order_cancel",
+            "post" => array(
+                "order_id" => (string)$iOrderId,
+            ),
+        ));
+
+        return $arResponse["success"] ?? false;
+    }
+
+    /**
      * @param array $arPost
      * @return array
      * @throws Exception
      */
-    public function orderStatus(array $arPost = array()): array
+    public function ordersCancel(array $arPost = array()): array
     {
         $arResponse = $this->request(array(
-            "method" => "order_status",
+            "method" => "orders_cancel",
             "post" => $arPost,
         ));
 
-        return $arResponse["order"] ?? array();
+        return $arResponse["items"] ?? array();
     }
 
     /**
@@ -135,6 +214,36 @@ class ApiTradePayeer
     {
         $arResponse = $this->request(array(
             "method" => "my_orders",
+            "post" => $arPost,
+        ));
+
+        return $arResponse["items"] ?? array();
+    }
+
+    /**
+     * @param array $arPost
+     * @return array
+     * @throws Exception
+     */
+    public function myHistory(array $arPost = array()): array
+    {
+        $arResponse = $this->request(array(
+            "method" => "my_history",
+            "post" => $arPost,
+        ));
+
+        return $arResponse["items"] ?? array();
+    }
+
+    /**
+     * @param array $arPost
+     * @return array
+     * @throws Exception
+     */
+    public function myTrades(array $arPost = array()): array
+    {
+        $arResponse = $this->request(array(
+            "method" => "my_trades",
             "post" => $arPost,
         ));
 
