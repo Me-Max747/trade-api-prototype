@@ -3,7 +3,7 @@
 class ApiTradePayeer
 {
     private array $arParams = array();
-    private array $arErrors = array();
+    private array $arError = array();
 
     public function __construct($arParams = array())
     {
@@ -11,9 +11,11 @@ class ApiTradePayeer
     }
 
     /**
+     * @param array $arRequest
+     * @return array
      * @throws Exception
      */
-    private function request($arRequest = array()): ?array
+    private function request(array $arRequest = array()): array
     {
         $arRequest["post"]["ts"] = round(microtime(true) * 1000);
 
@@ -40,26 +42,38 @@ class ApiTradePayeer
 
         if($arResponse["success"] !== true)
         {
-            $this->arErrors[] = $arResponse["error"];
+            $this->arError = $arResponse["error"];
             throw new Exception($arResponse["error"]["code"]);
         }
 
-        return $arResponse;
+        return $arResponse ?? array();
     }
 
+    /**
+     * @return array
+     */
     public function getError(): array
     {
-        return $this->arErrors;
+        return $this->arError;
     }
 
-    public function info(): ?array
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function info(): array
     {
         return $this->request(array(
             "method" => "info",
         ));
     }
 
-    public function orders($sPair = "BTC_USDT"): ?array
+    /**
+     * @param string $sPair
+     * @return array
+     * @throws Exception
+     */
+    public function orders(string $sPair = "BTC_USDT"): array
     {
         $arResponse = $this->request(array(
             "method" => "orders",
@@ -68,19 +82,28 @@ class ApiTradePayeer
             ),
         ));
 
-        return $arResponse["pairs"];
+        return $arResponse["pairs"] ?? array();
     }
 
-    public function account(): ?array
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function account(): array
     {
         $arResponse = $this->request(array(
             "method" => "account",
         ));
 
-        return $arResponse["balances"];
+        return $arResponse["balances"] ?? array();
     }
 
-    public function orderCreate($arPost = array()): ?array
+    /**
+     * @param array $arPost
+     * @return array
+     * @throws Exception
+     */
+    public function orderCreate(array $arPost = array()): array
     {
         return $this->request(array(
             "method" => "order_create",
@@ -88,23 +111,33 @@ class ApiTradePayeer
         ));
     }
 
-    public function orderStatus($arPost = array())
+    /**
+     * @param array $arPost
+     * @return array
+     * @throws Exception
+     */
+    public function orderStatus(array $arPost = array()): array
     {
         $arResponse = $this->request(array(
             "method" => "order_status",
             "post" => $arPost,
         ));
 
-        return $arResponse["order"];
+        return $arResponse["order"] ?? array();
     }
 
-    public function myOrders($arPost = array())
+    /**
+     * @param array $arPost
+     * @return array
+     * @throws Exception
+     */
+    public function myOrders(array $arPost = array()): array
     {
         $arResponse = $this->request(array(
             "method" => "my_orders",
             "post" => $arPost,
         ));
 
-        return $arResponse["items"];
+        return $arResponse["items"] ?? array();
     }
 }
