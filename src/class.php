@@ -31,7 +31,7 @@ class TradeApi
         curl_setopt($rsCurlHandler, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($rsCurlHandler, CURLOPT_HEADER, false);
         curl_setopt($rsCurlHandler, CURLOPT_POST, true);
-        curl_setopt($rsCurlHandler, CURLOPT_POSTFIELDS, $arPost);
+        curl_setopt($rsCurlHandler, CURLOPT_POSTFIELDS, $arRequest["post"]);
         curl_setopt($rsCurlHandler, CURLOPT_HTTPHEADER, array(
             "Content-Type: application/json",
             "API-ID: ".$this->arParams["id"],
