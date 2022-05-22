@@ -1,0 +1,20 @@
+{
+  "name": "memax747/payeer",
+  "type": "library",
+  "description": "Payeer Trade API",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "MeMax747\\Payeer\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Maksim Mezentsev",
+      "email": "memax747@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  }
+}

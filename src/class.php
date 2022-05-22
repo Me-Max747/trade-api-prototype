@@ -1,6 +1,9 @@
 <?php
+namespace MeMax747\Payeer;
 
-class ApiTradePayeer
+use \Exception;
+
+class TradeApi
 {
     private array $arParams = array();
     private array $arError = array();
